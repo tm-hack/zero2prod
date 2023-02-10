@@ -1,4 +1,5 @@
 # プロジェクトの概要
+[Zero To Production In Rust](https://www.lpalmieri.com/posts/)を進めています。
 
 ## ユーザストーリー
 * ブログの訪問者として、ニュースレターを購読して、ブログに新しいコンテンツが公開されたときに最新情報を電子メールで受信できるようにしたいと考えています。
@@ -17,4 +18,3 @@
 * パイプライン:：Github Actions（予定）
 
 ## 参考資料
-[Zero To Production In Rust](https://www.lpalmieri.com/posts/)
