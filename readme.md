@@ -1,6 +1,5 @@
 # プロジェクトの概要
-[Zero To Production In Rust](https://www.lpalmieri.com/posts/)を進めています。
-
+[Zero To Production In Rust](https://www.lpalmieri.com/)を進めています。
 以下はそのメモです。
 
 ## 実現したいユーザストーリー
@@ -22,8 +21,8 @@
 ## 参考資料
 
 ### CIツール
-[Setup - Toolchain, IDEs, CI](https://www.lpalmieri.com/posts/2020-06-06-zero-to-production-1-setup-toolchain-ides-ci/)
+* [Setup - Toolchain, IDEs, CI](https://www.lpalmieri.com/posts/2020-06-06-zero-to-production-1-setup-toolchain-ides-ci/)
 
-[100日後にRustをちょっと知ってる人になる: [Day 72]脆弱性チェック: cargo audit](https://zenn.dev/shinyay/articles/hello-rust-day072)
+* [100日後にRustをちょっと知ってる人になる: [Day 72]脆弱性チェック: cargo audit](https://zenn.dev/shinyay/articles/hello-rust-day072)
 
-[Rustの新しいコードカバレッジ/Source-based code coverage](https://qiita.com/dalance/items/69e18fe300760f8d7de0)
+* [Rustの新しいコードカバレッジ/Source-based code coverage](https://qiita.com/dalance/items/69e18fe300760f8d7de0)
