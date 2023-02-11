@@ -1,4 +1,3 @@
-# プロジェクトの概要
 [Zero To Production In Rust](https://www.lpalmieri.com/)を進めています。
 以下はそのメモです。
 
