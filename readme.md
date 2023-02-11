@@ -37,5 +37,5 @@
 * [Rustの新しいコードカバレッジ/Source-based code coverage](https://qiita.com/dalance/items/69e18fe300760f8d7de0)
 
 ### 非同期処理
-* [Asynchronous Programming in Rust] (https://async-book-ja.netlify.app/01_getting_started/01_chapter.html)
+* [Asynchronous Programming in Rust](https://async-book-ja.netlify.app/01_getting_started/01_chapter.html)
 * [Tokio チュートリアル (日本語訳)](https://zenn.dev/magurotuna/books/tokio-tutorial-ja)
