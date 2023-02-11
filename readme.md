@@ -17,6 +17,16 @@
 * 脆弱性対策：cargo audit
 * パイプライン:：Github Actions（予定）
 
+## 各記事に対する備忘
+### #1 Setup - Toolchain, IDEs, CI
+* IDEにはvscodeを使用する
+* コードカバレッジにはcargo llvm-covを使用する
+* cargo auditは予めopenssl関連のライブラリがインストールされていないとビルドエラーになる
+
+### #2 Learn By Building An Email Newsletter
+
+### #3 How To Bootstrap A Rust Web API From Scratch
+
 ## 参考資料
 
 ### CIツール
