@@ -26,12 +26,16 @@
 ### #2 Learn By Building An Email Newsletter
 
 ### #3 How To Bootstrap A Rust Web API From Scratch
+* tokio::spwnクレートからmainを呼び出すことによりアプリケーションをバックグラウンドタスクとして実行する
+* 非同期部分のロジックが分からないため、tokioを利用したasync/awaitの仕組みについてはちゃんと学習したい
 
 ## 参考資料
 
 ### CIツール
 * [Setup - Toolchain, IDEs, CI](https://www.lpalmieri.com/posts/2020-06-06-zero-to-production-1-setup-toolchain-ides-ci/)
-
 * [100日後にRustをちょっと知ってる人になる: [Day 72]脆弱性チェック: cargo audit](https://zenn.dev/shinyay/articles/hello-rust-day072)
-
 * [Rustの新しいコードカバレッジ/Source-based code coverage](https://qiita.com/dalance/items/69e18fe300760f8d7de0)
+
+### 非同期処理
+* [Asynchronous Programming in Rust] (https://async-book-ja.netlify.app/01_getting_started/01_chapter.html)
+* [Tokio チュートリアル (日本語訳)](https://zenn.dev/magurotuna/books/tokio-tutorial-ja)
