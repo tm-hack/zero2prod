@@ -19,7 +19,7 @@ async fn health_check_works() {
 }
 
 fn spawn_app() -> String {
-    let listner = TcpListener::bind("127.0.0.1:0").expect("Failed to bind address");
+    let listner = TcpListener::bind("127.0.0.2:0").expect("Failed to bind address");
 
     let port = listner.local_addr().unwrap().port();
     let server = zero2prod::run(listner).expect("Failed to bind address");
