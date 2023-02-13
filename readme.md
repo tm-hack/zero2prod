@@ -35,7 +35,7 @@
 * リンティング：cargo clippy
 * フォーマット：cargo fmt
 * 脆弱性対策：cargo audit
-* パイプライン:：Github Actions（予定）
+* パイプライン:：Github Actions
 
 ## 各記事に対する備忘
 ### #1 Setup - Toolchain, IDEs, CI
