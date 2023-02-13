@@ -61,6 +61,13 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 > * before calling subscribe actix-web invokes the from_request method for all subscribe's input arguments: in our case, Form::from_request;
 > * Form::from_request tries to deserialise the body into FormData according to the rules of URL-encoding leveraging serde_urlencoded and the Deserialize implementation of FormData, automatically generated for us by #[derive(serde::Deserialize)];
 > * if Form::from_request fails, a 400 BAD REQUEST is returned to the caller. If it succeeds, subscribe is invoked and we return a 200 OK.
+* Postgreのみを対象にsqlx-cliをインストールしたい場合は[公式ドキュメント](https://github.com/launchbadge/sqlx/tree/main/sqlx-cli#with-rust-toolchain)を参考に以下のコマンドを入力する。
+``` bash
+# only for postgres
+$ cargo install --version=0.6.0 sqlx-cli --no-default-features --features native-tls,postgres
+```
+* ローカルのpgadminから構築したpostgresコンテナに接続する方法が分からなかった。postgresコンテナにpgadminを入れる必要があるのは分かるが、手順が不明である。
+
 
 ## 参考資料
 
@@ -75,8 +82,12 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 * [Asynchronous Programming in Rust](https://async-book-ja.netlify.app/01_getting_started/01_chapter.html)
 * [Tokio チュートリアル (日本語訳)](https://zenn.dev/magurotuna/books/tokio-tutorial-ja)
 
-### 文字コードとか
-* [ASCII Encoding Reference](https://www.w3schools.com/tags/ref_urlencode.ASP)
-
-### データ処理
+### シリアライズ／デシリアライズ
 * [RustのSerdeの簡単な紹介](https://qiita.com/garkimasera/items/0442ee896403c6b78fb2)
+
+### データベース周り
+* [launchbadge/sqlx](https://github.com/launchbadge/sqlx)
+* [launchbadge/sqlx/sqlx-cli](https://github.com/launchbadge/sqlx/tree/main/sqlx-cli#with-rust-toolchain)
+
+### その他
+* [ASCII Encoding Reference](https://www.w3schools.com/tags/ref_urlencode.ASP)
