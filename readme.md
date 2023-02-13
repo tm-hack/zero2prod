@@ -28,6 +28,7 @@
 
 ## 利用するミドルウェア
 * Webフレームワーク：actix_web
+* DBフレームワーク；sqlx
 
 ## 利用するCIツール
 * テスト：cargo test
