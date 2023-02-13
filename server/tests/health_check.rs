@@ -31,6 +31,8 @@ async fn health_check_works() {
     let future = tokio::spawn(app.server);
     let client = reqwest::Client::new();
 
+    println!("{}", app_address);
+
     // Act
     let response = client
         .get(&format!("{}/health_check", &app_address))
@@ -53,6 +55,8 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     let app_address = format!("http:{}:{}", app.ip_addr, app.port);
     let future = tokio::spawn(app.server);
     let client = reqwest::Client::new();
+
+    println!("{}", app_address);
 
     // Act
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
@@ -83,6 +87,8 @@ async fn subscribe_returns_a_400_when_data_is_missing() {
         ("email=ursula_le_guin%40gmail.com", "missing the name"),
         ("", "missing boh name and email"),
     ];
+
+    println!("{}", app_address);
 
     for (invalid_body, error_message) in test_cases {
         // Act
