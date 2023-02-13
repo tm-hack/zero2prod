@@ -53,6 +53,7 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 * health_check.rsにおいて、構造体としてAppを作成しfutureタスクをテストスクリプト内で作成、dropすることで、明示的なfutureタスクのdropを行った。
 
 ### #3.5 HTML forms, Databases, Integration tests
+* web::Form<構造体>とすることで、構造体のフィールド名とbodyの変数が対応する値を簡単に設定することができる
 * serdeを使用することで構造化データ（JSONやYAMLなど）のシリアライズ／デシリアライズすることができる。
 
 ## 参考資料
