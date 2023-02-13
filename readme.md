@@ -55,6 +55,11 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 ### #3.5 HTML forms, Databases, Integration tests
 * web::Form<構造体>とすることで、構造体のフィールド名とbodyの変数が対応する値を簡単に設定することができる
 * serdeを使用することで構造化データ（JSONやYAMLなど）のシリアライズ／デシリアライズすることができる。
+* 以下の文章はちゃんと理解できていないため後で復習したい。
+> We now have a good picture of what is happening:
+> * before calling subscribe actix-web invokes the from_request method for all subscribe's input arguments: in our case, Form::from_request;
+> * Form::from_request tries to deserialise the body into FormData according to the rules of URL-encoding leveraging serde_urlencoded and the Deserialize implementation of FormData, automatically generated for us by #[derive(serde::Deserialize)];
+> * if Form::from_request fails, a 400 BAD REQUEST is returned to the caller. If it succeeds, subscribe is invoked and we return a 200 OK.
 
 ## 参考資料
 
