@@ -50,13 +50,3 @@ jobs:
       - name: test
         run: cargo test --all -- --nocapture
         working-directory: server
-
-  cov:
-    runs-on: ubuntu-latest
-
-    steps:
-      - run: rustup component add llvm-cov
-
-      - name: cov
-        run: cargo llvm-cov
-        working-directory: server
