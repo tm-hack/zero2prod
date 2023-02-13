@@ -58,6 +58,7 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 * [100日後にRustをちょっと知ってる人になる: [Day 72]脆弱性チェック: cargo audit](https://zenn.dev/shinyay/articles/hello-rust-day072)
 * [Rustの新しいコードカバレッジ/Source-based code coverage](https://qiita.com/dalance/items/69e18fe300760f8d7de0)
 * [GitHubの新機能「GitHub Actions」で試すCI/CD](https://knowledge.sakura.ad.jp/23478/?gclid=CjwKCAiAuaKfBhBtEiwAht6H75-E5CRDd-qy1ZLk2Bxcmj1uDFsn9BgGU4EHjGdc1nWUP_NxJXdacxoCrtEQAvD_BwE)
+* [Rustとgithub actionsでCI環境構築](https://zenn.dev/naokifujita/articles/c890954165c21f)
 
 ### 非同期処理
 * [Asynchronous Programming in Rust](https://async-book-ja.netlify.app/01_getting_started/01_chapter.html)
