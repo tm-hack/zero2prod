@@ -1,3 +1,4 @@
+use actix_web::dev::Server;
 use std::net::TcpListener;
 
 #[tokio::test]
@@ -5,6 +6,7 @@ async fn health_check_works() {
     // Arrange
     let app = App::new();
     let address = format!("http:{}:{}", app.ip_addr, app.port);
+    let future = tokio::spawn(app.server);
     let client = reqwest::Client::new();
 
     // Act
@@ -19,12 +21,13 @@ async fn health_check_works() {
     assert_eq!(Some(0), response.content_length());
 
     // Finishing
-    drop(app);
+    drop(future);
 }
 
 struct App {
     ip_addr: String,
     port: u16,
+    server: Server,
 }
 
 impl App {
@@ -34,8 +37,11 @@ impl App {
         let listner = TcpListener::bind(bind_addr).expect("Failed to bind address");
         let port = listner.local_addr().unwrap().port();
         let server = zero2prod::run(listner).expect("Failed to bind address");
-        let _ = tokio::spawn(server);
 
-        App { ip_addr, port }
+        App {
+            ip_addr,
+            port,
+            server,
+        }
     }
 }
