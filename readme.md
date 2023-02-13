@@ -53,7 +53,7 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 * health_check.rsにおいて、構造体としてAppを作成しfutureタスクをテストスクリプト内で作成、dropすることで、明示的なfutureタスクのdropを行った。
 
 ### #3.5 HTML forms, Databases, Integration tests
-* 
+* serdeを使用することで構造化データ（JSONやYAMLなど）のシリアライズ／デシリアライズすることができる。
 
 ## 参考資料
 
@@ -70,3 +70,6 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 
 ### 文字コードとか
 * [ASCII Encoding Reference](https://www.w3schools.com/tags/ref_urlencode.ASP)
+
+### データ処理
+* [RustのSerdeの簡単な紹介](https://qiita.com/garkimasera/items/0442ee896403c6b78fb2)
