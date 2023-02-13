@@ -52,6 +52,9 @@
 TcpListnerを利用して空いているポートをOSによりバインドしたlistnerを作成し、HttpServerに引き渡すことで空いているポートを利用して通信ができる。
 * health_check.rsにおいて、構造体としてAppを作成しfutureタスクをテストスクリプト内で作成、dropすることで、明示的なfutureタスクのdropを行った。
 
+### #3.5 HTML forms, Databases, Integration tests
+* 
+
 ## 参考資料
 
 ### CI構築
@@ -64,3 +67,6 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 ### 非同期処理
 * [Asynchronous Programming in Rust](https://async-book-ja.netlify.app/01_getting_started/01_chapter.html)
 * [Tokio チュートリアル (日本語訳)](https://zenn.dev/magurotuna/books/tokio-tutorial-ja)
+
+### 文字コードとか
+* [ASCII Encoding Reference](https://www.w3schools.com/tags/ref_urlencode.ASP)
