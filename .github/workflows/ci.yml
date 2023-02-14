@@ -1,4 +1,4 @@
-name: CI for server
+name: Rust
 
 on:
   # NB: this differs from the book's project!
@@ -14,9 +14,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
     services:
       postgres:
         image: postgres:12
@@ -37,26 +34,23 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/server/.cargo/registry
-            ~/server/.cargo/git
+            ~/.cargo/registry
+            ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
-          path: |
-            ~/server
 
       - name: Cache sqlx-cli
         uses: actions/cache@v2
         id: cache-sqlx
         with:
           path: |
-            ~/server/.cargo/bin/sqlx
+            ~/.cargo/bin/sqlx
           key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}
 
       - name: Install sqlx-cli
@@ -71,26 +65,20 @@ jobs:
             --features ${{ env.SQLX_FEATURES }}
             --no-default-features
             --locked
-          path: |
-            ~/server
 
       - name: Migrate database
         run: |
           sudo apt-get install libpq-dev -y
           SKIP_DOCKER=true ./scripts/init_db.sh
+
       - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
-          path: |
-            ~/server
 
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -98,22 +86,14 @@ jobs:
           toolchain: stable
           override: true
           components: rustfmt
-          path: |
-            ~/server
-
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all -- --check
-          path: |
-            ~/server
 
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
     services:
       postgres:
         image: postgres:12
@@ -136,15 +116,13 @@ jobs:
           components: clippy
           toolchain: stable
           override: true
-          path: |
-            ~/server
 
       - name: Cache sqlx-cli
         uses: actions/cache@v2
         id: cache-sqlx
         with:
           path: |
-            ~/server/.cargo/bin/sqlx
+            ~/.cargo/bin/sqlx
           key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}
 
       - name: Install sqlx-cli
@@ -159,27 +137,21 @@ jobs:
             --features ${{ env.SQLX_FEATURES }}
             --no-default-features
             --locked
-          path: |
-            ~/server
 
       - name: Migrate database
         run: |
           sudo apt-get install libpq-dev -y
           SKIP_DOCKER=true ./scripts/init_db.sh
+
       - name: Run clippy
         uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: -- -D warnings
-          path: |
-            ~/server
 
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: server
     services:
       postgres:
         image: postgres:12
@@ -201,15 +173,13 @@ jobs:
         with:
           toolchain: stable
           override: true
-          path: |
-            ~/server
 
       - name: Cache sqlx-cli
         uses: actions/cache@v2
         id: cache-sqlx
         with:
           path: |
-            ~/server/.cargo/bin/sqlx
+            ~/.cargo/bin/sqlx
           key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}
 
       - name: Install sqlx-cli
@@ -224,16 +194,13 @@ jobs:
             --features ${{ env.SQLX_FEATURES }}
             --no-default-features
             --locked
-          path: |
-            ~/server
 
       - name: Migrate database
         run: |
           sudo apt-get install libpq-dev -y
           SKIP_DOCKER=true ./scripts/init_db.sh
+
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
           args: "--ignore-tests --avoid-cfg-tarpaulin"
-          path: |
-            ~/server
