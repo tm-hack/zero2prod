@@ -12,12 +12,15 @@ env:
 
 defaults:
   run:
-    working-directory: ./server
+    working-directory: server
 
 jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
     services:
       postgres:
         image: postgres:12
@@ -83,6 +86,9 @@ jobs:
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -99,6 +105,9 @@ jobs:
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
     services:
       postgres:
         image: postgres:12
@@ -156,6 +165,9 @@ jobs:
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
     services:
       postgres:
         image: postgres:12
