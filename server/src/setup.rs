@@ -1,19 +1,19 @@
 use crate::routes::{health_check, subscribe};
 use actix_web::{dev::Server, web, App, HttpServer};
-use sqlx::PgConnection;
+use sqlx::PgPool;
 use std::net::TcpListener;
 
-pub fn run(listner: TcpListener, connection: PgConnection) -> Result<Server, std::io::Error> {
-    // DBサーバに対しては各スレッドで同一の接続定義を保有する必要があるため、
-    // connectionのポインタを取得して新しいスレッドに引き渡す
-    let connection = web::Data::new(connection);
+pub fn run(listner: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Error> {
+    // DBサーバに対しては各worker間で同一の接続定義を共有する必要があるため、
+    // db_poolのポインタを取得して新しいworkerに引き渡す
+    let db_pool = web::Data::new(db_pool);
 
-    // 新しいスレッドを起動する
+    // 新しいworkerを起動する
     let server = HttpServer::new(move || {
         App::new()
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
-            .app_data(connection.clone())
+            .app_data(db_pool.clone())
     })
     .listen(listner)?
     .run();

@@ -32,7 +32,7 @@
 
 ## 利用するCIツール
 * テスト：cargo test
-* コードカバレッジ：cargo llvm-cov
+* コードカバレッジ：cargo tarpaulin
 * リンティング：cargo clippy
 * フォーマット：cargo fmt
 * 脆弱性対策：cargo audit
@@ -41,7 +41,6 @@
 ## 各記事に対する備忘
 ### #1 Setup - Toolchain, IDEs, CI
 * IDEにはvscodeを使用する
-* コードカバレッジにはcargo llvm-covを使用する
 * cargo auditは予めopenssl関連のライブラリがインストールされていないとビルドエラーになる
 
 ### #2 Learn By Building An Email Newsletter
@@ -67,6 +66,8 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 $ cargo install --version=0.6.0 sqlx-cli --no-default-features --features native-tls,postgres
 ```
 * ローカルのpgadminから構築したpostgresコンテナに接続する方法が分からなかった。postgresコンテナにpgadminを入れる必要があるのは分かるが、手順が不明である。
+* acticx-webが内部的にどういったフローで処理を行っているのかを調査したい。[これ](https://x1.inkenkun.com/archives/5890)に似ていると思われるが内部の実装を見ていくとactix_netが出てこないため違う気がする。
+* actix_webではApp::new()で新しいworkerを生成するが、DBサーバに対しては各スレッドで同一の接続定義を共有する必要があるため、web::Dataを使用して接続定義に対するポインタを生成し各worker間で共有する。
 
 
 ## 参考資料
@@ -84,6 +85,10 @@ $ cargo install --version=0.6.0 sqlx-cli --no-default-features --features native
 
 ### シリアライズ／デシリアライズ
 * [RustのSerdeの簡単な紹介](https://qiita.com/garkimasera/items/0442ee896403c6b78fb2)
+
+### Webサーバ周り
+* [actix/actix-web](https://github.com/actix/actix-web)
+* [actix_webはActorモデルでどのようにwebリクエストを捌いているのか]https://x1.inkenkun.com/archives/5890)
 
 ### データベース周り
 * [launchbadge/sqlx](https://github.com/launchbadge/sqlx)

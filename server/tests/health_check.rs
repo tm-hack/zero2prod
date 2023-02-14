@@ -1,24 +1,32 @@
 use actix_web::dev::Server;
+use sqlx::PgPool;
 use std::net::TcpListener;
+use zero2prod::configuration::get_configuration;
+use zero2prod::setup::run;
 
-struct App {
-    ip_addr: String,
-    port: u16,
-    server: Server,
+pub struct App {
+    pub addr: String,
+    pub server: Server,
+    pub db_pool: PgPool,
 }
 
 impl App {
-    fn new() -> App {
-        let ip_addr = "127.0.0.1".to_string();
-        let bind_addr = format!("{ip_addr}:0");
-        let listner = TcpListener::bind(bind_addr).expect("Failed to bind app_address");
+    async fn new() -> App {
+        let listner = TcpListener::bind("127.0.0.1:0").expect("Failed to bind app_address");
         let port = listner.local_addr().unwrap().port();
-        let server = zero2prod::run(listner).expect("Failed to bind app_address");
+        let addr = format!("http://127.0.0.1:{}", port);
+
+        let configuration = get_configuration().expect("Failed to read configuration.");
+        let db_pool = PgPool::connect(&configuration.database.connection_string())
+            .await
+            .expect("Failed to connect to Postgres");
+
+        let server = run(listner, db_pool.clone()).expect("Failed to bind app_address");
 
         App {
-            ip_addr,
-            port,
+            addr,
             server,
+            db_pool,
         }
     }
 }
@@ -26,16 +34,13 @@ impl App {
 #[tokio::test]
 async fn health_check_works() {
     // Arrange
-    let app = App::new();
-    let app_address = format!("http:{}:{}", app.ip_addr, app.port);
+    let app = App::new().await;
     let future = tokio::spawn(app.server);
     let client = reqwest::Client::new();
 
-    println!("{}", app_address);
-
     // Act
     let response = client
-        .get(&format!("{}/health_check", &app_address))
+        .get(&format!("{}/health_check", &app.addr))
         .send()
         .await
         .expect("Failed to execute request");
@@ -51,25 +56,29 @@ async fn health_check_works() {
 #[tokio::test]
 async fn subscribe_returns_a_200_for_valid_form_data() {
     // Arrange
-    let app = App::new();
-    let app_address = format!("http:{}:{}", app.ip_addr, app.port);
+    let app = App::new().await;
     let future = tokio::spawn(app.server);
     let client = reqwest::Client::new();
-
-    println!("{}", app_address);
 
     // Act
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
     let response = client
-        .post(&format!("{}/subscriptions", &app_address))
+        .post(&format!("{}/subscriptions", &app.addr))
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
         .await
         .expect("Failed to execute request");
 
+    let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
+        .fetch_one(&app.db_pool)
+        .await
+        .expect("Failed to fetch saved suscription.");
+
     // Assert
     assert_eq!(200, response.status().as_u16());
+    assert_eq!(saved.name, "le guin");
+    assert_eq!(saved.email, "ursula_le_guin@gmail.com");
 
     // Finishing
     drop(future);
@@ -78,22 +87,20 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
 #[tokio::test]
 async fn subscribe_returns_a_400_when_data_is_missing() {
     // Arrange
-    let app = App::new();
-    let app_address = format!("http:{}:{}", app.ip_addr, app.port);
+    let app = App::new().await;
     let future = tokio::spawn(app.server);
     let client = reqwest::Client::new();
+
     let test_cases = vec![
         ("name=le%20guin", "missing the email"),
         ("email=ursula_le_guin%40gmail.com", "missing the name"),
         ("", "missing boh name and email"),
     ];
 
-    println!("{}", app_address);
-
     for (invalid_body, error_message) in test_cases {
         // Act
         let response = client
-            .post(&format!("{}/subscriptions", &app_address))
+            .post(&format!("{}/subscriptions", &app.addr))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(invalid_body)
             .send()
