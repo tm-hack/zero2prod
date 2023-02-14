@@ -1,17 +1,18 @@
-name: Rust
+name: CI for server
 
 on:
   # NB: this differs from the book's project!
   # These settings allow us to run this specific CI pipeline for PRs against
   # this specific branch (a.k.a. book chapter).
-  push:
-    branches:
-      - root-chapter-03-part1
   pull_request:
     types: [opened, synchronize, reopened]
 
 env:
   CARGO_TERM_COLOR: always
+
+defaults:
+  run:
+    working-directory: server
 
 jobs:
   test:
@@ -41,14 +42,13 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          working-directory: server
+
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
-          working-directory: server
 
       - name: Cache sqlx-cli
         uses: actions/cache@v2
@@ -57,7 +57,6 @@ jobs:
           path: |
             ~/.cargo/bin/sqlx
           key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}
-          working-directory: server
 
       - name: Install sqlx-cli
         uses: actions-rs/cargo@v1
@@ -71,7 +70,7 @@ jobs:
             --features ${{ env.SQLX_FEATURES }}
             --no-default-features
             --locked
-          working-directory: server
+
       - name: Migrate database
         run: |
           sudo apt-get install libpq-dev -y
@@ -80,7 +79,6 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          working-directory: server
 
   fmt:
     name: Rustfmt
@@ -92,12 +90,11 @@ jobs:
           toolchain: stable
           override: true
           components: rustfmt
-          working-directory: server
+
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all -- --check
-          working-directory: server
 
   clippy:
     name: Clippy
@@ -124,7 +121,6 @@ jobs:
           components: clippy
           toolchain: stable
           override: true
-          working-directory: server
 
       - name: Cache sqlx-cli
         uses: actions/cache@v2
@@ -146,7 +142,7 @@ jobs:
             --features ${{ env.SQLX_FEATURES }}
             --no-default-features
             --locked
-          working-directory: server
+
       - name: Migrate database
         run: |
           sudo apt-get install libpq-dev -y
@@ -156,7 +152,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: -- -D warnings
-          working-directory: server
 
   coverage:
     name: Code coverage
@@ -182,7 +177,6 @@ jobs:
         with:
           toolchain: stable
           override: true
-          working-directory: server
 
       - name: Cache sqlx-cli
         uses: actions/cache@v2
@@ -191,7 +185,6 @@ jobs:
           path: |
             ~/.cargo/bin/sqlx
           key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}
-          working-directory: server
 
       - name: Install sqlx-cli
         uses: actions-rs/cargo@v1
@@ -205,7 +198,7 @@ jobs:
             --features ${{ env.SQLX_FEATURES }}
             --no-default-features
             --locked
-          working-directory: server
+
       - name: Migrate database
         run: |
           sudo apt-get install libpq-dev -y
@@ -214,4 +207,3 @@ jobs:
         uses: actions-rs/tarpaulin@v0.1
         with:
           args: "--ignore-tests --avoid-cfg-tarpaulin"
-          working-directory: server
