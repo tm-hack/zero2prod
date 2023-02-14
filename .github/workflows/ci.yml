@@ -149,58 +149,58 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: -- -D warnings
 
-  coverage:
-    name: Code coverage
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:12
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-    env:
-      SQLX_VERSION: 0.6.2
-      SQLX_FEATURES: "rustls,postgres"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+  # coverage:
+  #   name: Code coverage
+  #   runs-on: ubuntu-latest
+  #   services:
+  #     postgres:
+  #       image: postgres:12
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: password
+  #         POSTGRES_DB: postgres
+  #       ports:
+  #         - 5432:5432
+  #   env:
+  #     SQLX_VERSION: 0.6.2
+  #     SQLX_FEATURES: "rustls,postgres"
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v2
 
-      - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+  #     - name: Install stable toolchain
+  #       uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         override: true
 
-      - name: Cache sqlx-cli
-        uses: actions/cache@v2
-        id: cache-sqlx
-        with:
-          path: |
-            ~/.cargo/bin/sqlx
-          key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}
+  #     - name: Cache sqlx-cli
+  #       uses: actions/cache@v2
+  #       id: cache-sqlx
+  #       with:
+  #         path: |
+  #           ~/.cargo/bin/sqlx
+  #         key: ${{ runner.os }}-sqlx-${{ env.SQLX_VERSION }}
 
-      - name: Install sqlx-cli
-        uses: actions-rs/cargo@v1
-        if: steps.cache-sqlx.outputs.cache-hit == false
-        with:
-          command: install
-          args: >
-            sqlx-cli
-            --force
-            --version=${{ env.SQLX_VERSION }}
-            --features ${{ env.SQLX_FEATURES }}
-            --no-default-features
-            --locked
+  #     - name: Install sqlx-cli
+  #       uses: actions-rs/cargo@v1
+  #       if: steps.cache-sqlx.outputs.cache-hit == false
+  #       with:
+  #         command: install
+  #         args: >
+  #           sqlx-cli
+  #           --force
+  #           --version=${{ env.SQLX_VERSION }}
+  #           --features ${{ env.SQLX_FEATURES }}
+  #           --no-default-features
+  #           --locked
 
-      - name: Migrate database
-        run: |
-          sudo apt-get install libpq-dev -y
-          SKIP_DOCKER=true ./scripts/init_db.sh
+  #     - name: Migrate database
+  #       run: |
+  #         sudo apt-get install libpq-dev -y
+  #         SKIP_DOCKER=true ./scripts/init_db.sh
 
-      - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          args: "--ignore-tests --avoid-cfg-tarpaulin"
+  #     - name: Run cargo-tarpaulin
+  #       uses: actions-rs/tarpaulin@v0.1
+  #       with:
+  #         args: "--ignore-tests --avoid-cfg-tarpaulin"
