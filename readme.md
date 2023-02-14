@@ -88,7 +88,7 @@ $ cargo install --version=0.6.0 sqlx-cli --no-default-features --features native
 
 ### Webサーバ周り
 * [actix/actix-web](https://github.com/actix/actix-web)
-* [actix_webはActorモデルでどのようにwebリクエストを捌いているのか]https://x1.inkenkun.com/archives/5890)
+* [actix_webはActorモデルでどのようにwebリクエストを捌いているのか](https://x1.inkenkun.com/archives/5890)
 
 ### データベース周り
 * [launchbadge/sqlx](https://github.com/launchbadge/sqlx)
