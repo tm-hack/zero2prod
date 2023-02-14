@@ -11,19 +11,25 @@
 
 ```
 .
-├── .github
-│   └── workflows
-│       └── ci.yml // プルリク時のワークフロー
-├── readme.md  // 本ファイル
-└── server // APIサーバのフォルダ
-    ├── .gitignore
-    ├── Cargo.lock
-    ├── Cargo.toml
-    ├── src
-    │   ├── lib.rs
-    │   └── main.rs
-    └── tests
-        └── health_check.rs
+├── Cargo.lock
+├── Cargo.toml
+├── configuration.yaml
+├── migrations //データベースマイグレーション用のSQL
+│   └── 20230213141536_create_subscriptions_table.sql
+├── readme.md
+├── scripts
+│   └── init_db.sh //DBサーバ初期構築用のスクリプト
+├── src // ソースフォルダ
+│   ├── configuration.rs
+│   ├── lib.rs
+│   ├── main.rs
+│   ├── routes
+│   │   ├── health_check.rs
+│   │   ├── mod.rs
+│   │   └── subscriptions.rs
+│   └── setup.rs
+└── tests // テストフォルダ
+    └── health_check.r
 ```
 
 ## 利用するミドルウェア
