@@ -74,6 +74,7 @@ $ cargo install --version=0.6.0 sqlx-cli --no-default-features --features native
 * ローカルのpgadminから構築したpostgresコンテナに接続する方法が分からなかった。postgresコンテナにpgadminを入れる必要があるのは分かるが、手順が不明である。
 * acticx-webが内部的にどういったフローで処理を行っているのかを調査したい。[これ](https://x1.inkenkun.com/archives/5890)に似ていると思われるが内部の実装を見ていくとactix_netが出てこないため違う気がする。
 * actix_webではApp::new()で新しいworkerを生成するが、DBサーバに対しては各スレッドで同一の接続定義を共有する必要があるため、web::Dataを使用して接続定義に対するポインタを生成し各worker間で共有する。
+* テスト時はUuidをデータベース名にした新しいデータベースを生成することで同一のInsertを実行してもテストが正常に完了するようにしている。
 
 
 ## 参考資料
