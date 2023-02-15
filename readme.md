@@ -11,19 +11,25 @@
 
 ```
 .
-├── .github
-│   └── workflows
-│       └── ci.yml // プルリク時のワークフロー
-├── readme.md  // 本ファイル
-└── server // APIサーバのフォルダ
-    ├── .gitignore
-    ├── Cargo.lock
-    ├── Cargo.toml
-    ├── src
-    │   ├── lib.rs
-    │   └── main.rs
-    └── tests
-        └── health_check.rs
+├── Cargo.lock
+├── Cargo.toml
+├── configuration.yaml
+├── migrations //データベースマイグレーション用のSQL
+│   └── 20230213141536_create_subscriptions_table.sql
+├── readme.md
+├── scripts
+│   └── init_db.sh //DBサーバ初期構築用のスクリプト
+├── src // ソースフォルダ
+│   ├── configuration.rs
+│   ├── lib.rs
+│   ├── main.rs
+│   ├── routes
+│   │   ├── health_check.rs
+│   │   ├── mod.rs
+│   │   └── subscriptions.rs
+│   └── setup.rs
+└── tests // テストフォルダ
+    └── health_check.r
 ```
 
 ## 利用するミドルウェア
@@ -32,7 +38,7 @@
 
 ## 利用するCIツール
 * テスト：cargo test
-* コードカバレッジ：cargo llvm-cov
+* コードカバレッジ：cargo tarpaulin
 * リンティング：cargo clippy
 * フォーマット：cargo fmt
 * 脆弱性対策：cargo audit
@@ -41,7 +47,6 @@
 ## 各記事に対する備忘
 ### #1 Setup - Toolchain, IDEs, CI
 * IDEにはvscodeを使用する
-* コードカバレッジにはcargo llvm-covを使用する
 * cargo auditは予めopenssl関連のライブラリがインストールされていないとビルドエラーになる
 
 ### #2 Learn By Building An Email Newsletter
@@ -61,6 +66,16 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 > * before calling subscribe actix-web invokes the from_request method for all subscribe's input arguments: in our case, Form::from_request;
 > * Form::from_request tries to deserialise the body into FormData according to the rules of URL-encoding leveraging serde_urlencoded and the Deserialize implementation of FormData, automatically generated for us by #[derive(serde::Deserialize)];
 > * if Form::from_request fails, a 400 BAD REQUEST is returned to the caller. If it succeeds, subscribe is invoked and we return a 200 OK.
+* Postgreのみを対象にsqlx-cliをインストールしたい場合は[公式ドキュメント](https://github.com/launchbadge/sqlx/tree/main/sqlx-cli#with-rust-toolchain)を参考に以下のコマンドを入力する。
+``` bash
+# only for postgres
+$ cargo install --version=0.6.0 sqlx-cli --no-default-features --features native-tls,postgres
+```
+* ローカルのpgadminから構築したpostgresコンテナに接続する方法が分からなかった。postgresコンテナにpgadminを入れる必要があるのは分かるが、手順が不明である。
+* acticx-webが内部的にどういったフローで処理を行っているのかを調査したい。[これ](https://x1.inkenkun.com/archives/5890)に似ていると思われるが内部の実装を見ていくとactix_netが出てこないため違う気がする。
+* actix_webではApp::new()で新しいworkerを生成するが、DBサーバに対しては各スレッドで同一の接続定義を共有する必要があるため、web::Dataを使用して接続定義に対するポインタを生成し各worker間で共有する。
+* テスト時はUuidをデータベース名にした新しいデータベースを生成することで同一のInsertを実行してもテストが正常に完了するようにしている。
+
 
 ## 参考資料
 
@@ -75,8 +90,16 @@ TcpListnerを利用して空いているポートをOSによりバインドし�
 * [Asynchronous Programming in Rust](https://async-book-ja.netlify.app/01_getting_started/01_chapter.html)
 * [Tokio チュートリアル (日本語訳)](https://zenn.dev/magurotuna/books/tokio-tutorial-ja)
 
-### 文字コードとか
-* [ASCII Encoding Reference](https://www.w3schools.com/tags/ref_urlencode.ASP)
-
-### データ処理
+### シリアライズ／デシリアライズ
 * [RustのSerdeの簡単な紹介](https://qiita.com/garkimasera/items/0442ee896403c6b78fb2)
+
+### Webサーバ周り
+* [actix/actix-web](https://github.com/actix/actix-web)
+* [actix_webはActorモデルでどのようにwebリクエストを捌いているのか](https://x1.inkenkun.com/archives/5890)
+
+### データベース周り
+* [launchbadge/sqlx](https://github.com/launchbadge/sqlx)
+* [launchbadge/sqlx/sqlx-cli](https://github.com/launchbadge/sqlx/tree/main/sqlx-cli#with-rust-toolchain)
+
+### その他
+* [ASCII Encoding Reference](https://www.w3schools.com/tags/ref_urlencode.ASP)
