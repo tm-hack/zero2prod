@@ -1,10 +1,14 @@
+use env_logger::Env;
 use sqlx::PgPool;
 use std::net::TcpListener;
 use zero2prod::configuration::get_configuration;
-use zero2prod::setup::run;
+use zero2prod::startup::run;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
+    // 環境変数RUST_LOGが設定されていない場合はinfo以上のログを出力するように設定する
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+
     // configuration.yamlから設定情報を取得する
     let configuration = get_configuration().expect("Failed to read configuration.");
     let connection_pool = PgPool::connect(&configuration.database.connection_string())

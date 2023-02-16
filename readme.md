@@ -91,6 +91,72 @@ $ cargo install --version=0.6.0 sqlx-cli --no-default-features --features native
 * actix_webではApp::new()で新しいworkerを生成するが、DBサーバに対しては各スレッドで同一の接続定義を共有する必要があるため、web::Dataを使用して接続定義に対するポインタを生成し各worker間で共有する。
 * テスト時はUuidをデータベース名にした新しいデータベースを生成することで同一のInsertを実行してもテストが正常に完了するようにしている。
 
+### #4 Are we observable yet? An introduction to Rust telemetry
+
+* log crateは[Facadeパターン](https://ja.wikipedia.org/wiki/Facade_%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3)を活用している。logレコードを出力するために必要なツールは提供されるが、logレコードを処理する方法は規定されない。
+* 以下はRUST_LOG=traceでcargo runをし、health_checkを叩いた時の実行ログである。起動時に4つのworkerとTokio runtimeが起動していることが分かる。
+
+```bash
+[2023-02-16T15:54:15Z TRACE mio::poll] registering event source with poller: token=Token(0), interests=READABLE | WRITABLE
+[2023-02-16T15:54:15Z INFO  actix_server::builder] starting 4 workers
+[2023-02-16T15:54:15Z INFO  actix_server::server] Tokio runtime found; starting in existing Tokio runtime
+[2023-02-16T15:54:15Z TRACE actix_server::worker] starting server worker 0
+[2023-02-16T15:54:15Z TRACE actix_web::middleware::logger] Access log format: %a "%r" %s %b "%{Referer}i" "%{User-Agent}i" %T
+[2023-02-16T15:54:15Z TRACE mio::poll] registering event source with poller: token=Token(2147483649), interests=READABLE
+[2023-02-16T15:54:15Z TRACE actix_server::worker] starting server worker 1
+[2023-02-16T15:54:15Z TRACE actix_server::worker] service "actix-web-service-127.0.0.1:8000" is available
+[2023-02-16T15:54:15Z TRACE actix_web::middleware::logger] Access log format: %a "%r" %s %b "%{Referer}i" "%{User-Agent}i" %T
+[2023-02-16T15:54:15Z TRACE mio::poll] registering event source with poller: token=Token(2147483649), interests=READABLE
+[2023-02-16T15:54:15Z TRACE actix_server::worker] starting server worker 2
+[2023-02-16T15:54:15Z TRACE actix_server::worker] service "actix-web-service-127.0.0.1:8000" is available
+[2023-02-16T15:54:15Z TRACE actix_web::middleware::logger] Access log format: %a "%r" %s %b "%{Referer}i" "%{User-Agent}i" %T
+[2023-02-16T15:54:15Z TRACE mio::poll] registering event source with poller: token=Token(2147483649), interests=READABLE
+[2023-02-16T15:54:15Z TRACE actix_server::worker] starting server worker 3
+[2023-02-16T15:54:15Z TRACE actix_server::worker] service "actix-web-service-127.0.0.1:8000" is available
+[2023-02-16T15:54:15Z TRACE actix_web::middleware::logger] Access log format: %a "%r" %s %b "%{Referer}i" "%{User-Agent}i" %T
+[2023-02-16T15:54:15Z TRACE mio::poll] registering event source with poller: token=Token(2147483649), interests=READABLE
+[2023-02-16T15:54:15Z TRACE mio::poll] registering event source with poller: token=Token(0), interests=READABLE
+[2023-02-16T15:54:15Z TRACE actix_server::worker] service "actix-web-service-127.0.0.1:8000" is available
+[2023-02-16T15:54:15Z TRACE actix_server::signals] setting up OS signal listener
+[2023-02-16T15:54:50Z TRACE mio::poll] registering event source with poller: token=Token(0), interests=READABLE | WRITABLE
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] start flags: (empty)
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] start timers:
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   head timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   keep-alive timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   shutdown timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] end timers:
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   head timer is active and due to expire in 4848.6963 milliseconds
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   keep-alive timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   shutdown timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] end flags: STARTED
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] start flags: STARTED
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] start timers:
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   head timer is active and due to expire in 4848.51 milliseconds
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   keep-alive timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   shutdown timer is inactive
+[2023-02-16T15:54:50Z INFO  actix_web::middleware::logger] 127.0.0.1 "GET /health_check HTTP/1.1" 200 0 "-" "curl/7.68.0" 0.000160
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] end timers:
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   head timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   keep-alive timer is active and due to expire in 4847.9775 milliseconds
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   shutdown timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] end flags: STARTED | FINISHED | KEEP_ALIVE
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] start flags: STARTED | FINISHED | KEEP_ALIVE
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] start timers:
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   head timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   keep-alive timer is active and due to expire in 4847.614 milliseconds
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   shutdown timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] read half closed; start shutdown
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] start flags: STARTED | KEEP_ALIVE | SHUTDOWN | READ_DISCONNECT
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] start timers:
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   head timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   keep-alive timer is active and due to expire in 4847.3984 milliseconds
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   shutdown timer is inactive
+[2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] end flags: STARTED | KEEP_ALIVE | SHUTDOWN | READ_DISCONNECT
+[2023-02-16T15:54:50Z TRACE mio::poll] deregistering event source from poller
+
+
+```
+
 ## 参考資料
 
 ### CI構築
