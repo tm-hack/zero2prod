@@ -179,6 +179,8 @@ Failed to execute query: error returned from database: duplicate key value viola
 [2023-02-17T14:03:28Z ERROR zero2prod::routes::subscriptions] Failed to execute query: Database(PgDatabaseError { severity: Error, code: "23505", message: "duplicate key value violates unique constraint \"subscriptions_email_key\"", detail: Some("Key (email)=(test@gmail.com) already exists."), hint: None, position: None, where: None, schema: Some("public"), table: Some("subscriptions"), column: None, data_type: None, constraint: Some("subscriptions_email_key"), file: Some("nbtinsert.c"), line: Some(664), routine: Some("_bt_check_unique") })
 ```
 
+* ログは簡単に紐づけられる必要がある。複数のリクエストを処理している場合、Webサーバ、DBサーバ間の通信は輻輳するため、ログにリクエストIDを出力することで関連付けを容易にする。
+
 ## 参考資料
 
 ### CI構築
