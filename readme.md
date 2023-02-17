@@ -153,8 +153,30 @@ $ cargo install --version=0.6.0 sqlx-cli --no-default-features --features native
 [2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher]   shutdown timer is inactive
 [2023-02-16T15:54:50Z TRACE actix_http::h1::dispatcher] end flags: STARTED | KEEP_ALIVE | SHUTDOWN | READ_DISCONNECT
 [2023-02-16T15:54:50Z TRACE mio::poll] deregistering event source from poller
+```
 
+* 単にprintlnで出力した場合とloggerで出力した場合の違いは以下の通り。subscriptionテーブルに対して全く同じinsertクエリを発行し、エラーを出力している。フォーマットを統一することで出力時刻、ログレベル等が明確になっている。また、単にprintlnを使用するよりもより詳細なメッセージを出力している。
 
+```bash
+# printlnで出力した場合
+[2023-02-17T13:55:14Z INFO  sqlx::query] INSERT INTO subscriptions (id, …; rows affected: 0, rows returned: 0, elapsed: 4.682ms
+    
+    INSERT INTO
+      subscriptions (id, email, name, subscribed_at)
+    VALUES
+    ($1, $2, $3, $4)
+    
+Failed to execute query: error returned from database: duplicate key value violates unique constraint "subscriptions_email_key"
+
+# log::error!で出力した場合
+2023-02-17T14:03:28Z INFO  sqlx::query] INSERT INTO subscriptions (id, …; rows affected: 0, rows returned: 0, elapsed: 698.603µs
+    
+    INSERT INTO
+      subscriptions (id, email, name, subscribed_at)
+    VALUES
+    ($1, $2, $3, $4)
+    
+[2023-02-17T14:03:28Z ERROR zero2prod::routes::subscriptions] Failed to execute query: Database(PgDatabaseError { severity: Error, code: "23505", message: "duplicate key value violates unique constraint \"subscriptions_email_key\"", detail: Some("Key (email)=(test@gmail.com) already exists."), hint: None, position: None, where: None, schema: Some("public"), table: Some("subscriptions"), column: None, data_type: None, constraint: Some("subscriptions_email_key"), file: Some("nbtinsert.c"), line: Some(664), routine: Some("_bt_check_unique") })
 ```
 
 ## 参考資料
